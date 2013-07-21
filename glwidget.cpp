@@ -61,10 +61,6 @@ static GLfloat texcoord[] = {
 	1, 0
 };
 
-static const int maxZoomIn = 3;
-static const int maxZoomOut = 512;
-static const int deltaZoom = 2;
-
 GLWidget::GLWidget(QWidget *parent)
 	: QGLWidget(parent)
 {
