@@ -120,12 +120,12 @@ void GLWidget::initializeGL()
 	}
 
 	// Load the floor texture (aka Grass)
-	QImage grassImage(32, 32, QImage::Format_ARGB32);
-	if (!grassImage.load("textures/grass.png", "png")) {
+	QPixmap grassPixmap("textures/grass.png", "png");
+	if (grassPixmap.isNull()) {
 		QMessageBox::critical(this, "Grass Texture", "Could not load textures/grass.png");
 		return;
 	}
-	m_grassTexture = bindTexture(grassImage, GL_TEXTURE_2D, GL_RGBA);
+	m_grassTexture = bindTexture(grassPixmap, GL_TEXTURE_2D, GL_RGBA);
 
 	// Load all of the snake textures
 	const QString directions[] = {
@@ -137,8 +137,8 @@ void GLWidget::initializeGL()
 	};
 
 	for (int i = 0; directions[i] != QString(); ++i) {
-		QImage snakeImage(32, 32, QImage::Format_ARGB32);
-		if (!snakeImage.load(QString(tr("textures/snake_%1.png").arg(directions[i])), "png")) {
+		QPixmap snakePixmap(tr("textures/snake_%1.png").arg(directions[i]), "png");
+		if (snakePixmap.isNull()) {
 			QMessageBox::critical(this, "Snake Texture", tr("Could not load textures/snake_%1.png").arg(directions[i]));
 			return;
 		}
@@ -146,7 +146,7 @@ void GLWidget::initializeGL()
 		GLuint texture;
 		glGenTextures(1, &texture);
 
-		texture = bindTexture(snakeImage, GL_TEXTURE_2D, GL_RGBA);
+		texture = bindTexture(snakePixmap, GL_TEXTURE_2D, GL_RGBA);
 		m_snakeTextures[directions[i]] = texture;
 	}
 	m_currentSnakeTexture = m_snakeTextures["right"]; // Right direction is the default.
