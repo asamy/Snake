@@ -19,30 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "texture.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-	QMainWindow(parent),
-	ui(new Ui::MainWindow)
+#include <string>
+#include <GL/glew.h>
+#include <SOIL/SOIL.h>
+
+Texture::Texture()
 {
-	ui->setupUi(this);
-
-#if 0
-	ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	ui->scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-	ui->scrollArea->setWidgetResizable(true);
-#endif
+	glGenTextures(1, &m_id);
 }
 
-MainWindow::~MainWindow()
+Texture::~Texture()
 {
-	delete ui;
+	glDeleteTextures(1, &m_id);
 }
 
-void MainWindow::keyPressEvent(QKeyEvent *event)
+bool Texture::loadTexture(const std::string& fileName)
 {
-	ui->widget->keyPressEvent(event);
-	QMainWindow::keyPressEvent(event);
+	int width;
+	int height;
+	unsigned char *data = SOIL_load_image(fileName.c_str(), &width, &height, 0, SOIL_LOAD_RGBA);
+	if (!data)
+		return false;
+
+	glBindTexture(GL_TEXTURE_2D, m_id);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+			width, height, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	SOIL_free_image_data(data);
+	return true;
+}
+
+void Texture::bind()
+{
+	glBindTexture(GL_TEXTURE_2D, m_id);
 }
 

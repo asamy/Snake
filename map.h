@@ -19,28 +19,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAP_H
+#define MAP_H
 
-#include <QMainWindow>
+#include "tile.h"
 
-namespace Ui {
-class MainWindow;
-}
+#include <list>
 
-class MainWindow : public QMainWindow
+class Map
 {
-	Q_OBJECT
-	
 public:
-	explicit MainWindow(QWidget *parent = 0);
-	~MainWindow();
+	Map() { }
+	~Map() { clear(); }
 
-protected:
-	void keyPressEvent(QKeyEvent *);
+	void addTile(const TilePtr& tile);
+	void removeTile(const PointF& pos);
+	void removeTile(const TilePtr& tile) { removeTile(tile->pos()); }
+	TilePtr getTile(const PointF& pos) const;
+	TilePtr getRandomTile() const;
+
+	inline void clear() { m_tiles.clear(); }
+	std::list<TilePtr> getTiles() const { return m_tiles; }
 
 private:
-	Ui::MainWindow *ui;
+	std::list<TilePtr> m_tiles;
 };
 
-#endif // MAINWINDOW_H
+#endif
+
