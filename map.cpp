@@ -63,3 +63,17 @@ TilePtr Map::getRandomTile() const
 	return *begin;
 }
 
+TilePtr Map::getClosestTile(const PointF& pos) const
+{
+	TilePtr ret = getTile(pos);
+	if (ret)
+		return ret;
+
+	float x, y;
+	for (y = pos.y(); y > 0; --y)
+		for (x = pos.x(); x > 0; x--)
+			if ((ret = getTile(PointF(x, y))))
+				return ret;
+	return nullptr;
+}
+

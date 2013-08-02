@@ -88,8 +88,14 @@ public:
 			return pos();
 		}
 
-		if (x < 0 || y < 0 || x >= maxX || y >= maxY)
-			return pos();
+		if (x < 0)
+			x = maxX;
+		else if (x >= maxX)
+			x = 0;
+		else if (y < 0)
+			y = maxY;
+		else if (y >= maxY)
+			y = 0;
 
 		return PointF(x, y);
 	}

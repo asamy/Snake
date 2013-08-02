@@ -37,6 +37,7 @@ public:
 	void removeTile(const TilePtr& tile) { removeTile(tile->pos()); }
 	TilePtr getTile(const PointF& pos) const;
 	TilePtr getRandomTile() const;
+	TilePtr getClosestTile(const PointF& pos) const;
 
 	inline void clear() { m_tiles.clear(); }
 	std::list<TilePtr> getTiles() const { return m_tiles; }

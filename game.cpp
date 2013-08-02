@@ -263,20 +263,10 @@ void Game::setSnakeDirection(Direction_t dir)
 void Game::updateSnakePos()
 {
 	PointF movePos = m_snake->move(m_width, m_height);
-	if (movePos == PointF()) {
-		m_lastInterval += --m_applesEaten * 3;
-		printf("%d\n", m_lastInterval);
-		if (m_lastInterval <= 200) {
-			std::cout << "You lost!" << std::endl;
-			m_lastInterval = 600;
-		}
-
-		return;
-	}
-
-	TilePtr moveTile = m_map.getTile(movePos);
+	TilePtr moveTile = m_map.getClosestTile(movePos);
 	if (!moveTile) {
-		std::cerr << "Internal error: Failed to find a tile to move the snake on" << std::endl;
+		std::cerr << "Internal error: Failed to find a tile to move the snake on."
+			<< " Move pos: " << movePos << std::endl;
 		return;
 	}
 

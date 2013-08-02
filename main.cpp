@@ -56,7 +56,6 @@ static void asciiKey(unsigned char key, int x, int y)
 	}
 
 	g_game.setSnakeDirection(dir);
-	glutPostRedisplay();
 }
 
 static void specialKey(int key, int x, int y)
@@ -78,7 +77,6 @@ static void specialKey(int key, int x, int y)
 	}
 
 	g_game.setSnakeDirection(dir);
-	glutPostRedisplay();
 }
 
 int main(int argc, char **argv)
