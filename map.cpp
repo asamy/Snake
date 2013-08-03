@@ -29,7 +29,7 @@ void Map::addTile(const TilePtr& tile)
 	m_tiles.push_back(tile);
 }
 
-void Map::removeTile(const PointF& pos)
+void Map::removeTile(const Point& pos)
 {
 	auto it = std::find_if(m_tiles.begin(), m_tiles.end(),
 				[=] (const TilePtr& tile) { return tile->pos() == pos; } );
@@ -37,7 +37,7 @@ void Map::removeTile(const PointF& pos)
 		m_tiles.erase(it);
 }
 
-TilePtr Map::getTile(const PointF& pos) const
+TilePtr Map::getTile(const Point& pos) const
 {
 	auto it = std::find_if(m_tiles.begin(), m_tiles.end(),
 				[=] (const TilePtr& tile) { return tile->pos() == pos; } );
@@ -63,17 +63,9 @@ TilePtr Map::getRandomTile() const
 	return *begin;
 }
 
-TilePtr Map::getClosestTile(const PointF& pos) const
+PointF Map::transform2D(const Point& point)
 {
-	TilePtr ret = getTile(pos);
-	if (ret)
-		return ret;
-
-	float x, y;
-	for (y = pos.y(); y > 0; --y)
-		for (x = pos.x(); x > 0; x--)
-			if ((ret = getTile(PointF(x, y))))
-				return ret;
-	return nullptr;
+	return PointF(std::floor(point.x() / 32.f) * 32.f,
+			std::floor(point.y() / 32.f) * 32.f);
 }
 

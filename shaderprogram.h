@@ -22,9 +22,6 @@
 #ifndef SHADERPROGRAM_H
 #define SHADERPROGRAM_H
 
-#include <stdbool.h>
-#include <GL/glew.h>
-
 #include <vector>
 #include <string>
 

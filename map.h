@@ -33,14 +33,15 @@ public:
 	~Map() { clear(); }
 
 	void addTile(const TilePtr& tile);
-	void removeTile(const PointF& pos);
+	void removeTile(const Point& pos);
 	void removeTile(const TilePtr& tile) { removeTile(tile->pos()); }
-	TilePtr getTile(const PointF& pos) const;
+	TilePtr getTile(const Point& pos) const;
 	TilePtr getRandomTile() const;
-	TilePtr getClosestTile(const PointF& pos) const;
 
 	inline void clear() { m_tiles.clear(); }
-	std::list<TilePtr> getTiles() const { return m_tiles; }
+	inline std::list<TilePtr> getTiles() const { return m_tiles; }
+
+	PointF transform2D(const Point& point);
 
 private:
 	std::list<TilePtr> m_tiles;

@@ -34,3 +34,11 @@ std::ostream& operator<<(std::ostream& os, const PointF& p)
 	return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const Point& p)
+{
+	os << "Point(";
+	os << p.x() << ", " << p.y();
+	os << ")";
+	return os;
+}
+

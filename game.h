@@ -58,12 +58,14 @@ public:
 protected:
 	void createMapTiles();
 	void makeApple();
-	void renderAt(const PointF& pos, const TexturePtr& texture);
+	void renderAt(const Point& pos, const TexturePtr& texture);
 	void updateProjectionMatrix();
 
 private:
 	int m_width;
 	int m_height;
+	int m_viewportWidth;
+	int m_viewportHeight;
 	int m_lastInterval;
 	int m_applesEaten;
 	float m_zoom;
@@ -77,7 +79,7 @@ private:
 	std::array<TexturePtr, sizeof(directions) / sizeof(directions[0])> m_snakeTextures;
 	std::array<TexturePtr, 8> m_appleTextures;
 
-	SnakePtr m_snake;
+	Snake *m_snake;
 	TilePtr m_appleTile;
 };
 

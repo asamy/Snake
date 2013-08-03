@@ -22,8 +22,6 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <stdbool.h>
-#include <GL/glew.h>
 #include <memory>
 
 class Texture

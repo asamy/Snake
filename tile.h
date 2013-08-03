@@ -30,22 +30,22 @@
 class Tile
 {
 public:
-	Tile(const PointF& pos);
+	Tile(const Point& pos);
 	~Tile();
 
 	void addTexture(const TexturePtr& texture);
 	void removeTexture(const TexturePtr& texture);
 	TexturePtr popTexture();
 
-	PointF pos() const { return m_pos; }
-	PointF& pos() { return m_pos; }
-	void setPos(const PointF& pos) { m_pos = pos; }
+	Point pos() const { return m_pos; }
+	Point& pos() { return m_pos; }
+	void setPos(const Point& pos) { m_pos = pos; }
 
 	void clear() { m_textures.clear(); }
 	std::vector<TexturePtr> getTextures() const { return m_textures; }
 
 private:
-	PointF m_pos;
+	Point m_pos;
 	std::vector<TexturePtr> m_textures;
 };
 

@@ -23,6 +23,7 @@
 #define SNAKE_H
 
 #include "tile.h"
+
 typedef enum Direction {
 	DIRECTION_UP,
 	DIRECTION_DOWN,
@@ -39,8 +40,8 @@ public:
 	{ }
 	~Snake() { m_tile = nullptr; }
 
-	void setPos(const PointF& pos) { m_tile->setPos(pos); }
-	PointF pos() const { return m_tile->pos(); }
+	void setPos(const Point& pos) { m_tile->setPos(pos); }
+	Point pos() const { return m_tile->pos(); }
 
 	TilePtr tile() const { return m_tile; }
 	void setTile(const TilePtr& tile) { m_tile = tile; }
@@ -56,7 +57,7 @@ public:
 	Direction_t direction() const { return m_dir; }
 	void setDirection(Direction_t newDir) { m_dir = newDir; }
 
-	PointF move(int maxX, int maxY)
+	Point move(int maxX, int maxY)
 	{ 
 		/*
 		 * Psuedo Geometric Screen:
@@ -68,8 +69,8 @@ public:
 		 *             |
 		 *            -y
 		 */
-		float x = m_tile->pos().x();
-		float y = m_tile->pos().y();
+		int x = m_tile->pos().x();
+		int y = m_tile->pos().y();
 
 		switch (m_dir) {
 		case DIRECTION_UP:
@@ -97,14 +98,13 @@ public:
 		else if (y >= maxY)
 			y = 0;
 
-		return PointF(x, y);
+		return Point(x, y);
 	}
 
 private:
 	TilePtr m_tile;
 	Direction_t m_dir;
 };
-typedef std::shared_ptr<Snake> SnakePtr;
 
 #endif
 

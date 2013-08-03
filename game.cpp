@@ -50,18 +50,24 @@ void Game::createMapTiles()
 	TilePtr newTile;
 	PointF placePoint;
 
-	float width = std::ceil((float)m_width);
-	float height = std::ceil((float)m_height);
-	for (float x = 0, y = 0; y <= height; x += 32.f) {
-		if (x >= width) {
+	int x, y;
+	for (x = 0, y = 0 ;; x += 32) {
+		if (x >= m_width) {
+			m_viewportWidth = x - 32;
 			x = 0;
-			y += 32.f;
+			y += 32;
 		}
+		// Make sure we don't render offscreen
+		if (y >= m_height)
+			break;
 
-		newTile = TilePtr(new Tile(PointF(x, y)));
+		newTile = TilePtr(new Tile(Point(x, y)));
 		newTile->addTexture(m_grassTexture);
 		m_map.addTile(newTile);
 	}
+
+	m_viewportHeight = y - 32;
+	printf("%d %d\n", m_viewportWidth, y);
 }
 
 void Game::makeApple()
@@ -129,7 +135,7 @@ bool Game::initialize()
 
 		m_snakeTextures[i] = newTexture;
 	}
-	m_snake = SnakePtr(new Snake);
+	m_snake = new Snake;
 
 	for (int i = 1; i < 9; i++) {
 		std::stringstream ss;
@@ -173,14 +179,14 @@ void Game::resize(int w, int h)
 
 	static bool firstTime = true;
 	if (firstTime) {
-		m_snake->setTile(m_map.getTile(PointF(32.f, 32.f)));
+		m_snake->setTile(m_map.getTile(Point(32, 32)));
 		m_snake->setTexture(m_snakeTextures[0]);
 		m_snake->setDirection(DIRECTION_RIGHT);
 		firstTime = false;
 	}
 
 	if (m_appleTile) {
-		PointF applePos = m_appleTile->pos();
+		Point applePos = m_appleTile->pos();
 		// If we are resized from a high size into
 		// a low one, then we need to reposition the
 		// apple to fit the scene viewport.
@@ -262,8 +268,8 @@ void Game::setSnakeDirection(Direction_t dir)
 
 void Game::updateSnakePos()
 {
-	PointF movePos = m_snake->move(m_width, m_height);
-	TilePtr moveTile = m_map.getClosestTile(movePos);
+	Point movePos = m_snake->move(m_viewportWidth, m_viewportHeight);
+	TilePtr moveTile = m_map.getTile(movePos);
 	if (!moveTile) {
 		std::cerr << "Internal error: Failed to find a tile to move the snake on."
 			<< " Move pos: " << movePos << std::endl;
@@ -282,7 +288,7 @@ void Game::updateSnakePos()
 	m_snake->setTile(moveTile);
 }
 
-void Game::renderAt(const PointF& pos, const TexturePtr& texture)
+void Game::renderAt(const Point& pos, const TexturePtr& texture)
 {
 	static GLubyte indices[] = {
 		0, 1, 2,
@@ -296,7 +302,7 @@ void Game::renderAt(const PointF& pos, const TexturePtr& texture)
 		0, 1
 	};
 
-	m_program.setVertexData(Position, pos.data(), 2);
+	m_program.setVertexData(Position, m_map.transform2D(pos).data(), 2);
 	m_program.setVertexData(TexCoord, texcoord, 2);
 
 	texture->bind();

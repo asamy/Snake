@@ -2,7 +2,7 @@ BIN = Snake
 
 CXX = g++
 BTYPE = -g3 -ggdb3 -O1
-CXXFLAGS = -std=gnu++11 -Wall -DGLEW_STATIC ${BTYPE}
+CXXFLAGS = -std=gnu++11 -Wall -DGLEW_STATIC -include GL/glew.h ${BTYPE}
 LIBS = -lGL -lGLU -lGLEW -lglut -lSOIL
 
 OBJ_DIR = obj

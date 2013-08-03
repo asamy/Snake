@@ -23,7 +23,7 @@
 
 #include <algorithm>
 
-Tile::Tile(const PointF& pos)
+Tile::Tile(const Point& pos)
 	: m_pos(pos)
 {
 

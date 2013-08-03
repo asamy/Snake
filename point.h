@@ -69,6 +69,7 @@ public:
 		makeData();
 		return *this;
 	}
+
 	bool operator==(const TPoint<T>& other) const {
 		return other.m_x == m_x && other.m_y == m_y;	
 	}
@@ -78,10 +79,12 @@ public:
 };
 
 typedef TPoint<float> PointF;
+typedef TPoint<int> Point;
 
 /* Define lessthan operator for std::map  */
 extern bool operator<(const PointF& first, const PointF& second);
 extern std::ostream& operator<<(std::ostream& os, const PointF& p);
+extern std::ostream& operator<<(std::ostream& os, const Point& p);
 
 #endif
 
