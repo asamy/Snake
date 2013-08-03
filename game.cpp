@@ -48,7 +48,6 @@ Game::~Game()
 void Game::createMapTiles()
 {
 	TilePtr newTile;
-	PointF placePoint;
 
 	int x, y;
 	for (x = 0, y = 0 ;; x += 32) {
@@ -67,7 +66,6 @@ void Game::createMapTiles()
 	}
 
 	m_viewportHeight = y - 32;
-	printf("%d %d\n", m_viewportWidth, y);
 }
 
 void Game::makeApple()
