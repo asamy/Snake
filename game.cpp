@@ -31,7 +31,7 @@
 Game::Game() :
 	  m_width(DEFAULT_WIDTH),
 	  m_height(DEFAULT_HEIGHT),
-	  m_lastInterval(600),
+	  m_lastInterval(400),
 	  m_applesEaten(0),
 	  m_zoom(1.0f),
 	  m_newApple(true),
