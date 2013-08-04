@@ -52,7 +52,7 @@ public:
 	float getZoom() const { return m_zoom; }
 	void setZoom(float newZoom) { m_zoom = newZoom; updateProjectionMatrix(); }
 
-	int getTimer() const { return m_lastInterval; }
+	int getWaitInterval() const { return m_lastInterval; }
 	void setSnakeDirection(Direction_t dir);
 	void updateSnakePos();
 

@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-		timer.start(g_game.getTimer());
+		timer.start(g_game.getWaitInterval());
 	}
 
 	glfwDestroyWindow(window);
