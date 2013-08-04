@@ -20,104 +20,82 @@
  * THE SOFTWARE.
  */
 #include "game.h"
+#include "timer.h"
 
-#include <GL/glut.h>
+#include <GLFW/glfw3.h>
 #include <ctime>
 #include <iostream>
 
 Game g_game;
 
-static void timedout(int unused)
-{
-	g_game.updateSnakePos();
-	glutPostRedisplay();
-	glutTimerFunc(g_game.getTimer(), timedout, 0);
-}
-
-static void asciiKey(unsigned char key, int x, int y)
+static void keyPress(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
 	Direction_t dir = DIRECTION_INVALID;
+	if (action != GLFW_PRESS)
+		return;
+
 	switch (key) {
-	case 27:	// Escape key
-		exit(EXIT_SUCCESS);
+	case GLFW_KEY_ESCAPE:
+		glfwSetWindowShouldClose(window, GL_TRUE);
 		break;
-	case 'w': 	// Move up
+	case GLFW_KEY_UP:
+	case GLFW_KEY_W:
 		dir = DIRECTION_UP;
 		break;
-	case 's': 	// Move down
+	case GLFW_KEY_DOWN:
+	case GLFW_KEY_S:
 		dir = DIRECTION_DOWN;
 		break;
-	case 'a': 	// Move left
-		dir = DIRECTION_LEFT;
-		break;
-	case 'd':	// Move right
+	case GLFW_KEY_RIGHT:
+	case GLFW_KEY_D:
 		dir = DIRECTION_RIGHT;
 		break;
+	case GLFW_KEY_LEFT:
+	case GLFW_KEY_A:
+		dir = DIRECTION_LEFT;
+		break;
+	default:
+		return;
 	}
 
 	g_game.setSnakeDirection(dir);
 }
 
-static void specialKey(int key, int x, int y)
+static void error_callback(int error, const char *description)
 {
-	Direction_t dir = DIRECTION_INVALID;
-	switch (key) {
-	case GLUT_KEY_UP:
-		dir = DIRECTION_UP;
-		break;
-	case GLUT_KEY_DOWN:
-		dir = DIRECTION_DOWN;
-		break;
-	case GLUT_KEY_RIGHT:
-		dir = DIRECTION_RIGHT;
-		break;
-	case GLUT_KEY_LEFT:
-		dir = DIRECTION_LEFT;
-		break;
-	}
-
-	g_game.setSnakeDirection(dir);
+	fputs(description, stderr);
 }
 
 int main(int argc, char **argv)
 {
+	GLFWwindow *window;
+
 	srand(std::time(nullptr));
-	glutInit(&argc, argv);
-	glutInitWindowSize(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
-	glutCreateWindow("Snake");
+	glfwSetErrorCallback(error_callback);
+	if (!glfwInit())
+		return 1;
 
-	glutReshapeFunc([] (int w, int h) { g_game.resize(w, h); } );
-	glutDisplayFunc([] {
-				g_game.render();
-				glutSwapBuffers();
+	window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Snake", nullptr, nullptr);
+	if (!window) {
+		glfwTerminate();
+		return 1;
+	}
 
-				static bool firstCall = true;
-				if (firstCall) {
-					glutTimerFunc(1000, timedout, 0);
-					firstCall = false;
-				}
-			   }
-			);
-	glutKeyboardFunc(&asciiKey);
-	glutSpecialFunc(&specialKey);
-	glutMouseFunc( []
-		(int button, int state, int x, int y) {
-		if (button == 3 || button == 4) {
-			// Wheel Event
-			if (state == GLUT_UP)
-				return; // Disregard redundant GLUT_UP events
+	glfwMakeContextCurrent(window);
+	glfwSetKeyCallback(window, keyPress);
+	glfwSetFramebufferSizeCallback(window,
+				[] (GLFWwindow *window, int w, int h) {
+					g_game.resize(w, h);
+				});
+	glfwSetScrollCallback(window,
+				[] (GLFWwindow *window, double x, double y) {
+					float newZoom = g_game.getZoom();
+					newZoom += (float)y / 4.f;
+					if (newZoom < 0)
+						newZoom = 1.0f;
+					g_game.setZoom(newZoom);
+				});
 
-			float zoom;
-			if (button == 3)	// Zoom in.
-				zoom =  0.1f;
-			else			// Zoom out
-				zoom = -0.1f;
-
-			g_game.updateZoom(zoom);
-			glutPostRedisplay();
-		}}
-	);
 
 	glewExperimental = GL_TRUE;
 	const GLenum err = glewInit();
@@ -135,7 +113,22 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	glutMainLoop();
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	g_game.resize(width, height);
+
+	Timer timer;
+	timer.setTimerFunc(std::bind(&Game::updateSnakePos, &g_game));
+	while (!glfwWindowShouldClose(window)) {
+		g_game.render();
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+
+		timer.start(g_game.getTimer());
+	}
+
+	glfwDestroyWindow(window);
+	glfwTerminate();
 	return 0;
 }
 

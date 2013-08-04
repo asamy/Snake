@@ -3,10 +3,10 @@ BIN = Snake
 CXX = g++
 BTYPE = -g3 -ggdb3 -O1
 CXXFLAGS = -std=gnu++11 -Wall -DGLEW_STATIC -include GL/glew.h ${BTYPE}
-LIBS = -lGL -lGLU -lGLEW -lglut -lSOIL
+LIBS = -lGL -lGLU -lGLEW -lglfw3 -lXi -lXrandr -lSOIL
 
 OBJ_DIR = obj
-SRC = point.cpp shaderprogram.cpp texture.cpp tile.cpp map.cpp game.cpp main.cpp
+SRC = point.cpp timer.cpp shaderprogram.cpp texture.cpp tile.cpp map.cpp game.cpp main.cpp
 OBJ = ${SRC:%.cpp=${OBJ_DIR}/%.o}
 
 .PHONY: all clean

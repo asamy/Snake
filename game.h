@@ -49,7 +49,8 @@ public:
 	bool initialize();
 	void render();
 	void resize(int w, int h);
-	void updateZoom(float f);
+	float getZoom() const { return m_zoom; }
+	void setZoom(float newZoom) { m_zoom = newZoom; updateProjectionMatrix(); }
 
 	int getTimer() const { return m_lastInterval; }
 	void setSnakeDirection(Direction_t dir);

@@ -232,12 +232,6 @@ void Game::updateProjectionMatrix()
 	m_program.setProjectionMatrix(projectionMatrix);
 }
 
-void Game::updateZoom(float zoom)
-{
-	m_zoom += zoom;
-	updateProjectionMatrix();
-}
-
 void Game::setSnakeDirection(Direction_t dir)
 {
 	m_snake->setDirection(dir);
