@@ -85,7 +85,8 @@ void Game::makeApple()
 	TilePtr placeTile = nullptr;
 	do
 		placeTile = m_map.getRandomTile();
-	while (placeTile && placeTile->pos() == snakeTile->pos());
+	while (placeTile && placeTile->pos() == snakeTile->pos()
+		&& placeTile->pos() != Point(m_viewportWidth, m_viewportHeight));;
 
 	if (!placeTile) {
 		/* Impossible to reach here...  */
@@ -195,7 +196,8 @@ void Game::resize(int w, int h)
 			TilePtr placeTile = nullptr;
 			do
 				placeTile = m_map.getRandomTile();
-			while (placeTile && placeTile->pos() == snakeTile->pos());
+			while (placeTile && placeTile->pos() == snakeTile->pos()
+				&& placeTile->pos() != Point(m_viewportWidth, m_viewportHeight));
 
 			if (!placeTile) {
 				/* Impossible to reach here...  */
@@ -268,7 +270,7 @@ void Game::updateSnakePos()
 		return;
 	}
 
-	if (movePos == m_appleTile->pos()) {
+	if (m_appleTile && movePos == m_appleTile->pos()) {
 		++m_applesEaten;
 		m_newApple = true;
 		m_appleTile->removeTexture(m_appleTile->getTextures()[1]);
