@@ -32,7 +32,7 @@ void Map::addTile(const TilePtr& tile)
 void Map::removeTile(const Point& pos)
 {
 	auto it = std::find_if(m_tiles.begin(), m_tiles.end(),
-				[=] (const TilePtr& tile) { return tile->pos() == pos; } );
+				[=] (const TilePtr& tile) -> bool { return tile->pos() == pos; } );
 	if (it != m_tiles.end())
 		m_tiles.erase(it);
 }
@@ -40,7 +40,7 @@ void Map::removeTile(const Point& pos)
 TilePtr Map::getTile(const Point& pos) const
 {
 	auto it = std::find_if(m_tiles.begin(), m_tiles.end(),
-				[=] (const TilePtr& tile) { return tile->pos() == pos; } );
+				[=] (const TilePtr& tile) -> bool { return tile->pos() == pos; } );
 	if (it != m_tiles.end())
 		return *it;
 	return nullptr;

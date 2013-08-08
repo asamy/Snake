@@ -34,17 +34,17 @@ private:
 
 	void makeData()
 	{
-		m_data[0] = m_x;
-		m_data[1] = m_y;
+		m_data[0] = m_x;	// 0
+		m_data[1] = m_y;	// 0
 
-		m_data[2] = m_x + 32;
-		m_data[3] = m_y;
+		m_data[2] = m_x + 32;	// 1
+		m_data[3] = m_y;	// 0
 
-		m_data[4] = m_x + 32;
-		m_data[5] = m_y + 32;
+		m_data[4] = m_x + 32;	// 1
+		m_data[5] = m_y + 32;	// 1
 
-		m_data[6] = m_x;
-		m_data[7] = m_y + 32;
+		m_data[6] = m_x;	// 0
+		m_data[7] = m_y + 32;	// 1
 	}
 
 public:
@@ -52,6 +52,7 @@ public:
 	TPoint()
 		: m_x(0), m_y(0)
 	{
+		makeData();
 	}
 	TPoint(const T& x, const T& y)
 		: m_x(x), m_y(y)
@@ -76,13 +77,29 @@ public:
 	bool operator!=(const TPoint<T>& other) const {
 		return other.m_x != m_x && other.m_y != m_y;
 	}
+	bool operator<(const TPoint<T>& other) const {
+		return m_x < other.m_x && m_y < other.m_y;
+	}
+
+	void checkBounds(int maxX, int maxY)
+	{
+		// Check screen bounds.
+		// This is for offscreen movements, i.e
+		// If the position hits the maximum width
+		// the position is reset so that it'd start
+		// at the beginning of the width, and so on.
+		if (m_x < 0)		m_x = maxX;	// Far Left
+		else if (m_x > maxX)	m_x = 0;	// Far Right
+		else if (m_y < 0)	m_y = maxY;	// Far Down
+		else if (m_y > maxY)	m_y = 0;	// Far Up
+		else			return;		// Avoid rewriting data
+		makeData();
+	}
 };
 
 typedef TPoint<float> PointF;
 typedef TPoint<int> Point;
 
-/* Define lessthan operator for std::map  */
-extern bool operator<(const PointF& first, const PointF& second);
 extern std::ostream& operator<<(std::ostream& os, const PointF& p);
 extern std::ostream& operator<<(std::ostream& os, const Point& p);
 

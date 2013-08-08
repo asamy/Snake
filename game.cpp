@@ -43,6 +43,19 @@ Game::Game() :
 Game::~Game()
 {
 	m_map.clear();
+	delete m_snake;
+}
+
+TilePtr Game::getRandomTile() const
+{
+	TilePtr ret;
+	TilePtr snakeTile = m_snake->tile();
+	Point offscreenPoint(m_viewportWidth, m_viewportHeight);
+
+	do
+		ret = m_map.getRandomTile();
+	while (ret && ret->pos() != snakeTile->pos() && ret->pos() != offscreenPoint);
+	return ret;
 }
 
 void Game::createMapTiles()
@@ -81,13 +94,7 @@ void Game::makeApple()
 	}
 
 	/* Figure out place position.  */
-	TilePtr snakeTile = m_snake->tile();
-	TilePtr placeTile = nullptr;
-	do
-		placeTile = m_map.getRandomTile();
-	while (placeTile && placeTile->pos() == snakeTile->pos()
-		&& placeTile->pos() != Point(m_viewportWidth, m_viewportHeight));;
-
+	const TilePtr& placeTile = getRandomTile();
 	if (!placeTile) {
 		/* Impossible to reach here...  */
 		std::cerr << "Internal error: Could find a suitable tile to place the food over, aborting..." << std::endl;
@@ -192,13 +199,7 @@ void Game::resize(int w, int h)
 		// However, instead of doing such job,
 		// we will just create a new apple elsewhere.
 		if (applePos.x() >= w || applePos.y() >= h) {
-			TilePtr snakeTile = m_snake->tile();
-			TilePtr placeTile = nullptr;
-			do
-				placeTile = m_map.getRandomTile();
-			while (placeTile && placeTile->pos() == snakeTile->pos()
-				&& placeTile->pos() != Point(m_viewportWidth, m_viewportHeight));
-
+			const TilePtr& placeTile = getRandomTile();
 			if (!placeTile) {
 				/* Impossible to reach here...  */
 				std::cerr << "Internal error: Could find a suitable tile to place the food over, aborting..." << std::endl;
@@ -262,7 +263,13 @@ void Game::setSnakeDirection(Direction_t dir)
 
 void Game::updateSnakePos()
 {
-	Point movePos = m_snake->move(m_viewportWidth, m_viewportHeight);
+	// Snake Position Controller
+	Point movePos = m_snake->move();
+
+	eatApple(movePos);	// First try, don't know if offscreen yet...
+	movePos.checkBounds(m_viewportWidth, m_viewportHeight);
+	eatApple(movePos);	// Second try, if offscreen eat apple and switch position.
+
 	TilePtr moveTile = m_map.getTile(movePos);
 	if (!moveTile) {
 		std::cerr << "Internal error: Failed to find a tile to move the snake on."
@@ -270,26 +277,29 @@ void Game::updateSnakePos()
 		return;
 	}
 
-	if (m_appleTile && movePos == m_appleTile->pos()) {
+	moveTile->addTexture(m_snake->tile()->popTexture());
+	m_snake->setTile(moveTile);
+}
+
+void Game::eatApple(const Point& applePos)
+{
+	if (m_appleTile && applePos == m_appleTile->pos() && m_appleTile->getTextures().size() > 1) {
 		++m_applesEaten;
 		m_newApple = true;
 		m_appleTile->removeTexture(m_appleTile->getTextures()[1]);
 		if (m_lastInterval - (m_applesEaten * 3) >= 200)
 			m_lastInterval -= m_applesEaten * 3;
 	}
-
-	moveTile->addTexture(m_snake->tile()->popTexture());
-	m_snake->setTile(moveTile);
 }
 
 void Game::renderAt(const Point& pos, const TexturePtr& texture)
 {
-	static GLubyte indices[] = {
+	static const GLubyte indices[] = {
 		0, 1, 2,
 		0, 2, 3
 	};
 
-	static GLfloat texcoord[] = {
+	static const GLfloat texcoord[] = {
 		0, 0,
 		1, 0,
 		1, 1,

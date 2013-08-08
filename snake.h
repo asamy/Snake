@@ -57,7 +57,7 @@ public:
 	Direction_t direction() const { return m_dir; }
 	void setDirection(Direction_t newDir) { m_dir = newDir; }
 
-	Point move(int maxX, int maxY)
+	Point move()
 	{ 
 		/*
 		 * Psuedo Geometric Screen:
@@ -88,15 +88,6 @@ public:
 		default:
 			return pos();
 		}
-
-		if (x < 0)
-			x = maxX;
-		else if (x >= maxX)
-			x = 0;
-		else if (y < 0)
-			y = maxY;
-		else if (y >= maxY)
-			y = 0;
 
 		return Point(x, y);
 	}

@@ -21,11 +21,6 @@
  */
 #include "point.h"
 
-bool operator<(const PointF& first, const PointF& second)
-{
-	return first.x() < second.x() && first.y() < second.y();
-}
-
 std::ostream& operator<<(std::ostream& os, const PointF& p)
 {
 	os << "PointF(";

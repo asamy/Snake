@@ -45,13 +45,11 @@ void Timer::setTimerFunc(const TimerFunc& func)
 
 void Timer::timerThread()
 {
-	while (true) {
+	for (;;) {
 		const auto& now = std::chrono::system_clock::now();
 		std::unique_lock<std::mutex> lock(m_mutex);
-		if (m_condition.wait_until(lock, now + std::chrono::milliseconds(m_interval)) == std::cv_status::timeout) {
-			lock.unlock();
+		if (m_condition.wait_until(lock, now + std::chrono::milliseconds(m_interval)) == std::cv_status::timeout)
 			m_func();
-		}
 	}
 }
 

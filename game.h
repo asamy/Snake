@@ -59,8 +59,11 @@ public:
 protected:
 	void createMapTiles();
 	void makeApple();
+	void eatApple(const Point& applePos);
 	void renderAt(const Point& pos, const TexturePtr& texture);
 	void updateProjectionMatrix();
+
+	TilePtr getRandomTile() const;
 
 private:
 	int m_width;
