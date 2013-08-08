@@ -34,7 +34,7 @@ public:
 	Timer();
 	~Timer();
 
-	void start(int msec);
+	void setInterval(int msec);
 	void setTimerFunc(const TimerFunc& func);
 
 protected:

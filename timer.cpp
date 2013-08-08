@@ -31,7 +31,7 @@ Timer::~Timer()
 
 }
 
-void Timer::start(int msec)
+void Timer::setInterval(int msec)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 	m_interval = msec;
