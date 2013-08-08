@@ -187,7 +187,7 @@ void Game::resize(int w, int h)
 	if (firstTime) {
 		m_snake->setTile(m_map.getTile(Point(32, 32)));
 		m_snake->setTexture(m_snakeTextures[0]);
-		m_snake->setDirection(DIRECTION_RIGHT);
+		m_snake->setDirection(DIRECTION_EAST);
 		firstTime = false;
 	}
 
@@ -241,16 +241,20 @@ void Game::setSnakeDirection(Direction_t dir)
 
 	TexturePtr newTexture;
 	switch (dir) {
-	case DIRECTION_UP:
+	case DIRECTION_NORTH:
 		newTexture = m_snakeTextures[3];
 		break;
-	case DIRECTION_DOWN:
+	case DIRECTION_SOUTH:
 		newTexture = m_snakeTextures[2];
 		break;
-	case DIRECTION_RIGHT:
+	case DIRECTION_EAST:
+	case DIRECTION_NORTHEAST:
+	case DIRECTION_SOUTHEAST:
 		newTexture = m_snakeTextures[0];
 		break;
-	case DIRECTION_LEFT:
+	case DIRECTION_WEST:
+	case DIRECTION_NORTHWEST:
+	case DIRECTION_SOUTHWEST:
 		newTexture = m_snakeTextures[1];
 		break;
 	case DIRECTION_INVALID:

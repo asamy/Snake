@@ -25,10 +25,17 @@
 #include "tile.h"
 
 typedef enum Direction {
-	DIRECTION_UP,
-	DIRECTION_DOWN,
-	DIRECTION_RIGHT,
-	DIRECTION_LEFT,
+	DIRECTION_NORTH,
+	DIRECTION_SOUTH,
+	DIRECTION_EAST,
+	DIRECTION_WEST,
+
+	// Diagonal movement
+	DIRECTION_NORTHWEST,
+	DIRECTION_NORTHEAST,
+	DIRECTION_SOUTHWEST,
+	DIRECTION_SOUTHEAST,
+
 	DIRECTION_INVALID
 } Direction_t;
 
@@ -73,17 +80,34 @@ public:
 		int y = m_tile->pos().y();
 
 		switch (m_dir) {
-		case DIRECTION_UP:
+		case DIRECTION_NORTH:
 			y += 32;
 			break;
-		case DIRECTION_DOWN:
+		case DIRECTION_SOUTH:
 			y -= 32;
 			break;
-		case DIRECTION_RIGHT:
+		case DIRECTION_EAST:
 			x += 32;
 			break;
-		case DIRECTION_LEFT:
+		case DIRECTION_WEST:
 			x -= 32;
+			break;
+		// Diagonal movement
+		case DIRECTION_NORTHWEST:
+			x -= 32;
+			y += 32;
+			break;
+		case DIRECTION_NORTHEAST:
+			x += 32;
+			y += 32;
+			break;
+		case DIRECTION_SOUTHWEST:
+			x -= 32;
+			y -= 32;
+			break;
+		case DIRECTION_SOUTHEAST:
+			x += 32;
+			y -= 32;
 			break;
 		default:
 			return pos();

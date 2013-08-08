@@ -88,7 +88,20 @@ public:
 		// If the position hits the maximum width
 		// the position is reset so that it'd start
 		// at the beginning of the width, and so on.
-		if (m_x < 0)		m_x = maxX;	// Far Left
+		if (m_x < 0 && m_y < 0) {		// Far South West
+			m_x = maxX;
+			m_y = maxY;
+		} else if (m_x < 0 && m_y > maxY) {	// Far North West
+			m_x = maxX;
+			m_y = 0;
+		} else if (m_x > maxX && m_y < 0) {	// Far South East
+			m_x = 0;
+			m_y = maxY;
+		} else if (m_x > maxX && m_y > maxY) {	// Far North East
+			m_x = 0;
+			m_y = 0;
+		}
+		else if (m_x < 0)	m_x = maxX;	// Far Left
 		else if (m_x > maxX)	m_x = 0;	// Far Right
 		else if (m_y < 0)	m_y = maxY;	// Far Down
 		else if (m_y > maxY)	m_y = 0;	// Far Up

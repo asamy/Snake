@@ -34,25 +34,50 @@ static void keyPress(GLFWwindow *window, int key, int scancode, int action, int 
 	if (action != GLFW_PRESS)
 		return;
 
+	// Keybad movement is supported
+	// 7 (NW)    8 (N)	9 (NE)
+	// 4 (W)     5 (unsup)  6 (E)
+	// 1 (SW)    2 (S)      3 (SE)
 	switch (key) {
 	case GLFW_KEY_ESCAPE:
 		glfwSetWindowShouldClose(window, GL_TRUE);
 		break;
 	case GLFW_KEY_UP:
 	case GLFW_KEY_W:
-		dir = DIRECTION_UP;
+	case GLFW_KEY_KP_8:
+		dir = DIRECTION_NORTH;
 		break;
 	case GLFW_KEY_DOWN:
 	case GLFW_KEY_S:
-		dir = DIRECTION_DOWN;
+	case GLFW_KEY_KP_2:
+		dir = DIRECTION_SOUTH;
 		break;
 	case GLFW_KEY_RIGHT:
 	case GLFW_KEY_D:
-		dir = DIRECTION_RIGHT;
+	case GLFW_KEY_KP_6:
+		dir = DIRECTION_EAST;
 		break;
 	case GLFW_KEY_LEFT:
 	case GLFW_KEY_A:
-		dir = DIRECTION_LEFT;
+	case GLFW_KEY_KP_4:
+		dir = DIRECTION_WEST;
+		break;
+	// Diagonal movement
+	case GLFW_KEY_KP_9:
+	case GLFW_KEY_E:
+		dir = DIRECTION_NORTHEAST;
+		break;
+	case GLFW_KEY_KP_7:
+	case GLFW_KEY_Q:
+		dir = DIRECTION_NORTHWEST;
+		break;
+	case GLFW_KEY_KP_1:
+	case GLFW_KEY_Z:
+		dir = DIRECTION_SOUTHWEST;
+		break;
+	case GLFW_KEY_KP_3:
+	case GLFW_KEY_C:
+		dir = DIRECTION_SOUTHEAST;
 		break;
 	default:
 		return;
