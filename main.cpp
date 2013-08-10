@@ -144,12 +144,16 @@ int main(int argc, char **argv)
 
 	Timer timer;
 	timer.setTimerFunc(std::bind(&Game::updateSnakePos, &g_game));
+
+	Timer removeTimer;
+	removeTimer.setTimerFunc(std::bind(&Game::removeFood, &g_game));
 	while (!glfwWindowShouldClose(window)) {
 		g_game.render();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
 		timer.setInterval(g_game.getWaitInterval());
+		removeTimer.setInterval(g_game.getWaitInterval() + 2000);
 	}
 
 	glfwDestroyWindow(window);

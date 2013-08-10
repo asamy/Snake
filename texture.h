@@ -24,6 +24,7 @@
 
 #include <memory>
 
+/* The smallest class, yet the most used.  */
 class Texture
 {
 public:

@@ -43,7 +43,6 @@ Game::~Game()
 {
 	m_map.clear();
 	delete m_snake;
-	delete m_grassTexture;
 }
 
 TilePtr Game::getRandomTile() const
@@ -74,7 +73,7 @@ void Game::createMapTiles()
 			break;
 
 		newTile = TilePtr(new Tile(Point(x, y)));
-		newTile->addTexture(TexturePtr(m_grassTexture));
+		newTile->addTexture(m_grassTexture);
 		m_map.addTile(newTile);
 	}
 
@@ -124,7 +123,7 @@ bool Game::initialize()
 	}
 	m_program.bind();
 
-	m_grassTexture = new Texture;
+	m_grassTexture = TexturePtr(new Texture);
 	if (!m_grassTexture->loadTexture("textures/grass.png")) {
 		std::cerr << "Failed to load the grass texture." << std::endl;
 		return false;
@@ -303,6 +302,18 @@ void Game::updateSnakePos()
 
 	moveTile->addTexture(m_snake->tile()->popTexture());
 	m_snake->setTile(moveTile);
+}
+
+void Game::removeFood()
+{
+	if (!m_foodTile)
+		return;
+
+	const auto& textures = m_foodTile->getTextures();
+	if (textures.size() > 1) {
+		m_foodTile->removeTexture(textures[1]);
+		m_newFood = true;
+	}
 }
 
 void Game::eatApple(const Point& foodPos)

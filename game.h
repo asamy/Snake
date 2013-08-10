@@ -54,7 +54,9 @@ public:
 
 	int getWaitInterval() const { return m_lastInterval; }
 	void setSnakeDirection(Direction_t dir);
+
 	void updateSnakePos();
+	void removeFood();
 
 protected:
 	void createMapTiles();
@@ -77,7 +79,7 @@ private:
 	Map m_map;
 	ShaderProgram m_program;
 
-	Texture *m_grassTexture;
+	TexturePtr m_grassTexture;
 
 	std::array<TexturePtr, sizeof(directions) / sizeof(directions[0])> m_snakeTextures;
 	std::array<TexturePtr, 8> m_appleTextures;
