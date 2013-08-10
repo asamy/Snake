@@ -21,14 +21,6 @@
  */
 #include "point.h"
 
-std::ostream& operator<<(std::ostream& os, const PointF& p)
-{
-	os << "PointF(";
-	os << p.x() << ", " << p.y();
-	os << ")";
-	return os;
-}
-
 std::ostream& operator<<(std::ostream& os, const Point& p)
 {
 	os << "Point(";

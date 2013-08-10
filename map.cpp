@@ -63,9 +63,3 @@ TilePtr Map::getRandomTile() const
 	return *begin;
 }
 
-PointF Map::transform2D(const Point& point)
-{
-	return PointF(std::floor(point.x() / 32.f) * 32.f,
-			std::floor(point.y() / 32.f) * 32.f);
-}
-

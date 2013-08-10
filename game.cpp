@@ -306,7 +306,7 @@ void Game::updateSnakePos()
 
 void Game::removeFood()
 {
-	if (!m_foodTile)
+	if (!m_foodTile || m_newFood)
 		return;
 
 	const auto& textures = m_foodTile->getTextures();
@@ -352,7 +352,6 @@ void Game::renderAt(const Point& pos, const TexturePtr& texture)
 		0, 1, 2,
 		0, 2, 3
 	};
-
 	static const GLfloat texcoord[] = {
 		0, 0,
 		1, 0,
@@ -360,7 +359,17 @@ void Game::renderAt(const Point& pos, const TexturePtr& texture)
 		0, 1
 	};
 
-	m_program.setVertexData(Position, m_map.transform2D(pos).data(), 2);
+	float x = std::floor(pos.x() / 32.f) * 32.f;
+	float y = std::floor(pos.y() / 32.f) * 32.f;
+
+	const GLfloat vertices[] = {
+		x,	y,
+		x + 32, y,
+		x + 32, y + 32,
+		x,	y + 32
+	};
+
+	m_program.setVertexData(Position, vertices, 2);
 	m_program.setVertexData(TexCoord, texcoord, 2);
 
 	texture->bind();

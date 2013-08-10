@@ -29,45 +29,25 @@ template<typename T>
 class TPoint
 {
 private:
-	std::array<T, 8> m_data;
 	T m_x, m_y;
-
-	void makeData()
-	{
-		m_data[0] = m_x;	// 0
-		m_data[1] = m_y;	// 0
-
-		m_data[2] = m_x + 32;	// 1
-		m_data[3] = m_y;	// 0
-
-		m_data[4] = m_x + 32;	// 1
-		m_data[5] = m_y + 32;	// 1
-
-		m_data[6] = m_x;	// 0
-		m_data[7] = m_y + 32;	// 1
-	}
 
 public:
 
 	TPoint()
 		: m_x(0), m_y(0)
 	{
-		makeData();
 	}
 	TPoint(const T& x, const T& y)
 		: m_x(x), m_y(y)
 	{
-		makeData();
 	}
 
 	T x() const { return m_x; }
 	T y() const { return m_y; }
-	const T* data() const { return m_data.data(); }
 
 	TPoint<T>& operator=(const TPoint<T>& other) {
 		m_x = other.m_x;
 		m_y = other.m_y;
-		makeData();
 		return *this;
 	}
 
@@ -92,14 +72,11 @@ public:
 		if (m_x > maxX)	m_x = 0;	// Far Right
 		if (m_y < 0)	m_y = maxY;	// Far Down
 		if (m_y > maxY)	m_y = 0;	// Far Up
-		makeData();
 	}
 };
 
-typedef TPoint<float> PointF;
 typedef TPoint<int> Point;
 
-extern std::ostream& operator<<(std::ostream& os, const PointF& p);
 extern std::ostream& operator<<(std::ostream& os, const Point& p);
 
 #endif

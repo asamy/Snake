@@ -41,8 +41,6 @@ public:
 	inline void clear() { m_tiles.clear(); }
 	inline std::list<TilePtr> getTiles() const { return m_tiles; }
 
-	PointF transform2D(const Point& point);
-
 private:
 	std::list<TilePtr> m_tiles;
 };
