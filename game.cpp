@@ -31,12 +31,11 @@
 Game::Game() :
 	  m_width(DEFAULT_WIDTH),
 	  m_height(DEFAULT_HEIGHT),
-	  m_lastInterval(400),
-	  m_applesEaten(0),
+	  m_lastInterval(190),
 	  m_zoom(1.0f),
-	  m_newApple(true),
+	  m_newFood(true),
 	  m_snake(nullptr),
-	  m_appleTile(nullptr)
+	  m_foodTile(nullptr)
 {
 }
 
@@ -44,6 +43,7 @@ Game::~Game()
 {
 	m_map.clear();
 	delete m_snake;
+	delete m_grassTexture;
 }
 
 TilePtr Game::getRandomTile() const
@@ -74,20 +74,21 @@ void Game::createMapTiles()
 			break;
 
 		newTile = TilePtr(new Tile(Point(x, y)));
-		newTile->addTexture(m_grassTexture);
+		newTile->addTexture(TexturePtr(m_grassTexture));
 		m_map.addTile(newTile);
 	}
 
 	m_viewportHeight = y - 32;
 }
 
-void Game::makeApple()
+void Game::makeFood()
 {
-	if (!m_newApple)
+	if (!m_newFood)
 		return;
 
+	const auto& textures = !(rand() % 5) ? m_baitTextures : m_appleTextures;
 	int randomIndex = rand() % 8;
-	const TexturePtr& foodTex = m_appleTextures[randomIndex];
+	const TexturePtr& foodTex = textures[randomIndex];
 	if (!foodTex) {
 		std::cerr << "Internal error: No apple texture at index " << randomIndex << ", aborting..." << std::endl;
 		std::abort();
@@ -101,9 +102,9 @@ void Game::makeApple()
 		std::abort();
 	}
 
-	m_appleTile = placeTile;
-	m_appleTile->addTexture(foodTex);
-	m_newApple = false;
+	m_foodTile = placeTile;
+	m_foodTile->addTexture(foodTex);
+	m_newFood = false;
 }
 
 bool Game::initialize()
@@ -123,7 +124,7 @@ bool Game::initialize()
 	}
 	m_program.bind();
 
-	m_grassTexture = TexturePtr(new Texture);
+	m_grassTexture = new Texture;
 	if (!m_grassTexture->loadTexture("textures/grass.png")) {
 		std::cerr << "Failed to load the grass texture." << std::endl;
 		return false;
@@ -149,10 +150,22 @@ bool Game::initialize()
 
 		TexturePtr newTexture(new Texture);
 		if (!newTexture->loadTexture(ss.str())) {
-			std::cerr << "Failed to load Snake Texture from: " << ss.str() << std::endl;
+			std::cerr << "Failed to load Apple Texture from: " << ss.str() << std::endl;
 			continue;
 		}
 		m_appleTextures[i - 1] = newTexture;
+	}
+
+	for (int i = 1; i < 9; ++i) {
+		std::stringstream ss;
+		ss << "textures/food/strawberry" << i << ".png";
+
+		TexturePtr newTexture(new Texture);
+		if (!newTexture->loadTexture(ss.str())) {
+			std::cerr << "Failed to load Strawberry texture from: " << ss.str() << std::endl;
+			continue;
+		}
+		m_baitTextures[i - 1] = newTexture;
 	}
 
 	glEnable(GL_BLEND);
@@ -168,8 +181,8 @@ void Game::render()
 	for (const TilePtr& tile : m_map.getTiles())
 		for (const TexturePtr& texture : tile->getTextures())
 			renderAt(tile->pos(), texture);
-	if (m_newApple)
-		makeApple();
+	if (m_newFood)
+		makeFood();
 }
 
 void Game::resize(int w, int h)
@@ -191,14 +204,14 @@ void Game::resize(int w, int h)
 		firstTime = false;
 	}
 
-	if (m_appleTile) {
-		Point applePos = m_appleTile->pos();
+	if (m_foodTile) {
+		Point foodPos = m_foodTile->pos();
 		// If we are resized from a high size into
 		// a low one, then we need to reposition the
 		// apple to fit the scene viewport.
 		// However, instead of doing such job,
-		// we will just create a new apple elsewhere.
-		if (applePos.x() >= w || applePos.y() >= h) {
+		// we will just create new food elsewhere.
+		if (foodPos.x() >= w || foodPos.y() >= h) {
 			const TilePtr& placeTile = getRandomTile();
 			if (!placeTile) {
 				/* Impossible to reach here...  */
@@ -206,14 +219,14 @@ void Game::resize(int w, int h)
 				std::abort();
 			}
 
-			const TexturePtr& appleTexture = m_appleTile->getTextures()[1];
-			m_appleTile = placeTile;
-			m_appleTile->addTexture(appleTexture);
+			const TexturePtr& foodTexture = m_foodTile->getTextures()[1];
+			m_foodTile = placeTile;
+			m_foodTile->addTexture(foodTexture);
 		} else {
-			// Remove the tile at the last apple position
-			m_map.removeTile(applePos);
+			// Remove the tile at the last food position
+			m_map.removeTile(foodPos);
 			// Now render the apple at it's previous position.
-			m_map.addTile(m_appleTile);
+			m_map.addTile(m_foodTile);
 		}
 	}
 }
@@ -237,9 +250,12 @@ void Game::updateProjectionMatrix()
 
 void Game::setSnakeDirection(Direction_t dir)
 {
-	m_snake->setDirection(dir);
+	if (m_snake->dead())
+		return;
 
+	m_snake->setDirection(dir);
 	TexturePtr newTexture;
+	// Have a look at Game::initialize() for the trivial indices.
 	switch (dir) {
 	case DIRECTION_NORTH:
 		newTexture = m_snakeTextures[3];
@@ -267,12 +283,16 @@ void Game::setSnakeDirection(Direction_t dir)
 
 void Game::updateSnakePos()
 {
+	if (m_snake->dead())
+		return;
+
 	// Snake Position Controller
 	Point movePos = m_snake->move();
-
-	eatApple(movePos);	// First try, don't know if offscreen yet...
-	movePos.checkBounds(m_viewportWidth, m_viewportHeight);
-	eatApple(movePos);	// Second try, if offscreen eat apple and switch position.
+	if (m_foodTile) {
+		eatApple(movePos);	// First try, don't know if offscreen yet...
+		movePos.checkBounds(m_viewportWidth, m_viewportHeight);
+		eatApple(movePos);	// Second try, if offscreen eat apple and switch position.
+	}
 
 	TilePtr moveTile = m_map.getTile(movePos);
 	if (!moveTile) {
@@ -285,14 +305,33 @@ void Game::updateSnakePos()
 	m_snake->setTile(moveTile);
 }
 
-void Game::eatApple(const Point& applePos)
+void Game::eatApple(const Point& foodPos)
 {
-	if (m_appleTile && applePos == m_appleTile->pos() && m_appleTile->getTextures().size() > 1) {
-		++m_applesEaten;
-		m_newApple = true;
-		m_appleTile->removeTexture(m_appleTile->getTextures()[1]);
-		if (m_lastInterval - (m_applesEaten * 3) >= 200)
-			m_lastInterval -= m_applesEaten * 3;
+	const auto& textures = m_foodTile->getTextures();
+
+	if (textures.size() > 1 && foodPos == m_foodTile->pos()) {
+		int damage = 0;
+		const TexturePtr& foodTexture = textures[1];
+		if (foodTexture) {
+			for (int i = 0; i < 8; ++i) {
+				if (foodTexture == m_appleTextures[i]) {
+					damage = i;
+					break;
+				} else if (foodTexture == m_baitTextures[i]) {
+					damage = -i;
+					break;
+				}
+			}
+		}
+
+		int hp = m_snake->eat(damage);
+		if (hp) {
+			m_newFood = true;
+			if (m_lastInterval - (hp / 6) >= 75)
+				m_lastInterval -= hp / 6;
+		}
+
+		m_foodTile->removeTexture(foodTexture);
 	}
 }
 

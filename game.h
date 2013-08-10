@@ -58,8 +58,8 @@ public:
 
 protected:
 	void createMapTiles();
-	void makeApple();
-	void eatApple(const Point& applePos);
+	void makeFood();
+	void eatApple(const Point& foodPos);
 	void renderAt(const Point& pos, const TexturePtr& texture);
 	void updateProjectionMatrix();
 
@@ -71,20 +71,20 @@ private:
 	int m_viewportWidth;
 	int m_viewportHeight;
 	int m_lastInterval;
-	int m_applesEaten;
 	float m_zoom;
-	bool m_newApple;
+	bool m_newFood;
 
 	Map m_map;
 	ShaderProgram m_program;
 
-	TexturePtr m_grassTexture;
+	Texture *m_grassTexture;
 
 	std::array<TexturePtr, sizeof(directions) / sizeof(directions[0])> m_snakeTextures;
 	std::array<TexturePtr, 8> m_appleTextures;
+	std::array<TexturePtr, 8> m_baitTextures;
 
 	Snake *m_snake;
-	TilePtr m_appleTile;
+	TilePtr m_foodTile;
 };
 
 extern Game g_game;

@@ -43,7 +43,8 @@ class Snake
 {
 public:
 	Snake()
-		: m_tile(nullptr), m_dir(DIRECTION_INVALID)
+		: m_tile(nullptr), m_dir(DIRECTION_INVALID),
+		  m_health(50)
 	{ }
 	~Snake() { m_tile = nullptr; }
 
@@ -64,6 +65,12 @@ public:
 	Direction_t direction() const { return m_dir; }
 	void setDirection(Direction_t newDir) { m_dir = newDir; }
 
+	bool dead() const { return m_health <= 0; }
+	int eat(int health)
+	{
+		m_health += health;
+		return m_health;
+	}
 	Point move()
 	{ 
 		/*
@@ -119,6 +126,7 @@ public:
 private:
 	TilePtr m_tile;
 	Direction_t m_dir;
+	int m_health;
 };
 
 #endif
