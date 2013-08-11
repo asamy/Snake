@@ -324,11 +324,11 @@ void Game::eatApple(const Point& foodPos)
 		int damage = 0;
 		const TexturePtr& foodTexture = textures[1];
 		if (foodTexture) {
-			for (int i = 0; i < 8; ++i) {
-				if (foodTexture == m_appleTextures[i]) {
+			for (int i = 1; i < 9; ++i) {
+				if (foodTexture == m_appleTextures[i - 1]) {
 					damage = i;
 					break;
-				} else if (foodTexture == m_baitTextures[i]) {
+				} else if (foodTexture == m_baitTextures[i - 1]) {
 					damage = -i;
 					break;
 				}
