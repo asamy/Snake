@@ -25,6 +25,7 @@
 #include "map.h"
 #include "snake.h"
 #include "shaderprogram.h"
+#include "scheduler.h"
 
 static const char *directions[] = {
 	"right",	// 0 - lookin right
@@ -52,9 +53,7 @@ public:
 	float getZoom() const { return m_zoom; }
 	void setZoom(float newZoom) { m_zoom = newZoom; updateProjectionMatrix(); }
 
-	int getWaitInterval() const { return m_lastInterval; }
 	void setSnakeDirection(Direction_t dir);
-
 	void updateSnakePos();
 	void removeFood();
 
@@ -72,7 +71,7 @@ private:
 	int m_height;
 	int m_viewportWidth;
 	int m_viewportHeight;
-	int m_lastInterval;
+	int m_waitInterval;
 	float m_zoom;
 	bool m_newFood;
 
@@ -85,6 +84,7 @@ private:
 	std::array<TexturePtr, 8> m_appleTextures;
 	std::array<TexturePtr, 8> m_baitTextures;
 
+	EventPtr m_removeEvent;
 	Snake *m_snake;
 	TilePtr m_foodTile;
 };

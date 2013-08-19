@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 #include "game.h"
-#include "timer.h"
+#include "scheduler.h"
 
 #include <GLFW/glfw3.h>
 #include <ctime>
@@ -142,22 +142,15 @@ int main(int argc, char **argv)
 	glfwGetFramebufferSize(window, &width, &height);
 	g_game.resize(width, height);
 
-	Timer timer;
-	timer.setTimerFunc(std::bind(&Game::updateSnakePos, &g_game));
-
-	Timer removeTimer;
-	removeTimer.setTimerFunc(std::bind(&Game::removeFood, &g_game));
 	while (!glfwWindowShouldClose(window)) {
 		g_game.render();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
-		timer.setInterval(g_game.getWaitInterval());
-		removeTimer.setInterval(g_game.getWaitInterval() + 2000);
 	}
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
+	g_sched.stop();
 	return 0;
 }
 

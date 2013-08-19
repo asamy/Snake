@@ -19,37 +19,60 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "timer.h"
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
-Timer::Timer()
+#include <thread>
+#include <functional>
+#include <condition_variable>
+#include <list>
+#include <chrono>
+
+typedef std::function<void ()> EventFunc;
+
+struct Event
 {
-	m_thread = std::thread(std::bind(&Timer::timerThread, this));
-}
-
-Timer::~Timer()
-{
-
-}
-
-void Timer::setInterval(int msec)
-{
-	std::lock_guard<std::mutex> guard(m_mutex);
-	m_interval = msec;
-}
-
-void Timer::setTimerFunc(const TimerFunc& func)
-{
-	std::lock_guard<std::mutex> guard(m_mutex);
-	m_func = func;
-}
-
-void Timer::timerThread()
-{
-	for (;;) {
-		const auto& now = std::chrono::system_clock::now();
-		std::unique_lock<std::mutex> lock(m_mutex);
-		if (m_condition.wait_until(lock, now + std::chrono::milliseconds(m_interval)) == std::cv_status::timeout)
-			m_func();
+	Event(const EventFunc& f, int64_t delay)
+	{
+		m_garbage = false;
+		m_f = f;
+		m_waitTime = std::chrono::system_clock::now() + std::chrono::milliseconds(delay);
 	}
-}
+	bool expired() const { return std::chrono::system_clock::now() >= m_waitTime; } 
+	bool garbage() const { return m_garbage; }
+	void setGarbage(bool g) { m_garbage = g; }
+	void operator()() { m_f(); }
+
+private:
+	bool m_garbage;
+	EventFunc m_f;
+	std::chrono::time_point<std::chrono::system_clock> m_waitTime;
+};
+typedef std::shared_ptr<Event> EventPtr;
+
+class Scheduler
+{
+public:
+	Scheduler();
+	~Scheduler();
+
+	EventPtr scheduleEvent(const EventFunc& fun, int64_t delay);
+	void removeEvent(const EventPtr& event);
+	void stop();
+
+protected:
+	void schedulerThread();
+
+private:
+	bool m_stopped;
+
+	std::list<EventPtr> m_eventList;
+	std::thread m_thread;
+	std::mutex m_mutex;
+	std::condition_variable m_condition;
+};
+
+extern Scheduler g_sched;
+
+#endif
 

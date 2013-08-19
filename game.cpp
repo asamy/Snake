@@ -31,9 +31,10 @@
 Game::Game() :
 	  m_width(DEFAULT_WIDTH),
 	  m_height(DEFAULT_HEIGHT),
-	  m_lastInterval(190),
+	  m_waitInterval(190),
 	  m_zoom(1.0f),
 	  m_newFood(true),
+	  m_removeEvent(nullptr),
 	  m_snake(nullptr),
 	  m_foodTile(nullptr)
 {
@@ -104,6 +105,11 @@ void Game::makeFood()
 	m_foodTile = placeTile;
 	m_foodTile->addTexture(foodTex);
 	m_newFood = false;
+
+	// Remove old one and schedule new if there is (most likely there is)
+	if (m_removeEvent && !m_removeEvent->expired())
+		g_sched.removeEvent(m_removeEvent);
+	m_removeEvent = g_sched.scheduleEvent(std::bind(&Game::removeFood, &g_game), m_waitInterval + 2000);
 }
 
 bool Game::initialize()
@@ -200,6 +206,7 @@ void Game::resize(int w, int h)
 		m_snake->setTile(m_map.getTile(Point(32, 32)));
 		m_snake->setTexture(m_snakeTextures[0]);
 		m_snake->setDirection(DIRECTION_EAST);
+		g_sched.scheduleEvent(std::bind(&Game::updateSnakePos, &g_game), m_waitInterval);
 		firstTime = false;
 	}
 
@@ -302,13 +309,13 @@ void Game::updateSnakePos()
 
 	moveTile->addTexture(m_snake->tile()->popTexture());
 	m_snake->setTile(moveTile);
+
+	g_sched.scheduleEvent(std::bind(&Game::updateSnakePos, &g_game), m_waitInterval);
 }
 
 void Game::removeFood()
 {
-	if (!m_foodTile || m_newFood)
-		return;
-
+	assert(m_foodTile);
 	const auto& textures = m_foodTile->getTextures();
 	if (textures.size() > 1) {
 		m_foodTile->removeTexture(textures[1]);
@@ -338,8 +345,8 @@ void Game::eatApple(const Point& foodPos)
 		int hp = m_snake->eat(damage);
 		if (hp) {
 			m_newFood = true;
-			if (m_lastInterval - (hp / 6) >= 75)
-				m_lastInterval -= hp / 6;
+			if (m_waitInterval - (hp / 3) >= 100)
+				m_waitInterval -= hp / 3;
 		}
 
 		m_foodTile->removeTexture(foodTexture);
