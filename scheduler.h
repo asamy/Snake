@@ -24,6 +24,7 @@
 
 #include <thread>
 #include <functional>
+#include <memory>
 #include <condition_variable>
 #include <list>
 #include <chrono>

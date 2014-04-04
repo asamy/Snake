@@ -77,22 +77,23 @@ void Scheduler::schedulerThread()
 		}
 
 		uniqueLock.unlock();
-		for (auto it = m_eventList.begin(); it != m_eventList.end(); ++it) {
+		for (auto it = m_eventList.begin(); it != m_eventList.end();) {
 			uniqueLock.lock();
 			const EventPtr& ev = *it;
 			uniqueLock.unlock();
 
 			if (ev->garbage()) {
 				uniqueLock.lock();
-				m_eventList.erase(it++);
+				it = m_eventList.erase(it);
 				uniqueLock.unlock();
 			} else if (ev->expired()) {
 				(*ev) ();
 
 				uniqueLock.lock();
-				m_eventList.erase(it++);
+				it = m_eventList.erase(it);
 				uniqueLock.unlock();
-			}
+			} else
+				++it;
 		}
 	}
 }
